@@ -2,7 +2,7 @@
 
 client_id = "2a612b46a85deda4f1434c84e61e9137"
 name = "voucher-app"
-application_url = "https://example.com"
+application_url = "https://shopify-voucher-app-production.up.railway.app"
 embedded = true
 
 [webhooks]
@@ -13,4 +13,4 @@ api_version = "2026-04"
 scopes = "write_metaobject_definitions,write_metaobjects,write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [ "https://shopify-voucher-app-production.up.railway.app/api/auth" ]
