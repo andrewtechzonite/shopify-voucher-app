@@ -1,0 +1,14 @@
+{
+  "name": "Voucher Widget",
+  "settings": {
+    "show_section": {
+      "label": "Show Voucher Widget"
+    },
+    "title": {
+      "label": "Title"
+    },
+    "background_color": {
+      "label": "Background Color"
+    }
+  }
+}

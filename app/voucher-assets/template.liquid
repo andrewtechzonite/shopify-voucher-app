@@ -1,0 +1,278 @@
+{% if customer %}
+  <script type="text/javascript">
+    window.customerId = "{{ customer.id }}";
+  </script>
+{% endif %}
+
+<script>
+  // Define this variable in your main Liquid template file
+  window.voucherImageMap = {
+    '30welcome': '{{ "welcome30.png" | asset_url }}',
+    '50welcome': '{{ "welcome50.png" | asset_url }}',
+    '50renewal': '{{ "renewal50.png" | asset_url }}',
+    '20silver': '{{ "silver20.png" | asset_url }}',
+    '20gold': '{{ "gold20.png" | asset_url }}',
+    'greentick': '{{ "greentick.png" | asset_url }}'
+  };
+</script>
+<script async src="{{ 'voucherget.js' | asset_url }}"></script>
+{{ 'voucher-list.css' | asset_url | stylesheet_tag }}
+
+{% schema %}
+{
+  "name": "Voucher List",
+  "tag": "section",
+  "class": "voucher-list",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [],
+  "presets": [
+  {
+    "name": "Voucher List"
+  }
+  ]
+}
+{% endschema %}
+{% assign stripped_tag = '' %}
+{% assign member_label = '' %}
+{% for tag in customer.tags %}
+  {% if tag contains 'skechers_' %}
+    {% assign stripped_tag = tag | remove: 'skechers_' %}
+    {% if stripped_tag == 'Gold' %}
+      {% assign member_label = 'Gold Member' %}
+    {% elsif stripped_tag == 'Silver' %}
+      {% assign member_label = 'Silver Member' %}
+    {% elsif stripped_tag == 'PreMember' %}
+      {% assign member_label = 'Pre-Member' %}
+    {% else %}
+      {% assign member_label = stripped_tag %}
+    {% endif %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+<script>
+  const customerStrippedTag = "{{ stripped_tag }}";
+</script>
+
+<div class="container mt-4">
+  <div class="greetings js-update" style="display: none;">
+    <p class="hiuser">
+      Welcome {{ customer.name }},<br>
+    </p>
+    <p>
+      You are currently a <span id="tier-tag" style="color: #0070C0; font-weight: bold;">{{ member_label }}</span> and have
+      <span id="points-value" style="color: #0070C0; font-weight: bold;">0</span> points expiring on
+      <span id="points-expiry" style="color: #213168; font-weight: bold;">X X 2025</span><br>
+      Your tier cycle is valid until <span id="cycle-end" style="color: #213168; font-weight: bold;">X X 2026</span>.
+    </p>
+    <div class="claim-points-container">
+      <a href="https://members.skechers.com.my/Login" target="_blank" class="claim-points">
+        Points Redemption
+      </a>
+    </div>
+  </div>
+
+  <div class="voucher-tabs">
+    <div class="voucher-tabs__header">
+      <div class="voucher-tabs__tab active" data-tab="active">Active</div>
+      <div class="voucher-tabs__tab" data-tab="redeemed">Redeemed</div>
+      <div class="voucher-tabs__tab" data-tab="expired">Expired</div>
+    </div>
+
+    <div class="voucher-tabs__content active" id="active-vouchers" style="display:none;">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+      <div id="active-row"></div>
+    </div>
+
+    <div class="voucher-tabs__content" id="redeemed-vouchers">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+      <div id="redeemed-row"></div>
+    </div>
+
+    <div class="voucher-tabs__content" id="expired-vouchers">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+      </div>
+      <div id="expired-row"></div>
+    </div>
+
+    <div class="voucher-footer">
+    <div class="faq-title1">Frequently Asked Question</div>
+    <div class="faq-title2">How Skechers Membership Works</div>
+
+    <div class="faq-container">
+    <!-- 1 -->
+    <div class="faq-item">
+      <button class="faq-question">How to apply for Skechers Membership?</button>
+      <div class="faq-answer">
+        <p>
+          Online <br>
+		  You can sign up as a Skechers Pre-Member by creating an account on our official website at 
+          <a href="https://www.skechers.com.my/" rel="noreferrer" class="focus-custom">www.skechers.com.my</a>
+        </p>
+        <p>
+          In-store: <br>
+		  Scan the QR code available at the cashier counter at any Skechers Concept Store, City Outlet, or Outlet to register as a Skechers Pre-Member. To upgrade to Silver or Gold Membership, members must meet the minimum spending requirement for the respective tier.
+        </p>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="faq-item">
+      <button class="faq-question">Where Can I Earn and Collect Points?</button>
+      <div class="faq-answer">
+        <p>
+          Silver and Gold Members can earn points at all Skechers Concept Stores and Skechers Website excluding Skechers City Outlets, Skechers Outlet stores, Skechers Shop in Shop, Department stores, Skechers Temporary Pop-Up Stores and Skechers Fairs. Please refer to the participating store list 
+          <a href="https://drive.google.com/file/d/1MyiZD99eWJ0aviYIL5T5ZP_KNSK8gmfu/view?usp=sharing" rel="noreferrer" class="focus-custom">here</a>
+		   for more details.
+        </p>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="faq-item">
+      <button class="faq-question">How do I earn points from my purchase?</button>
+      <div class="faq-answer">
+        <p>Provide your registered mobile number at the point of purchase to verify your membership account. Once verified, our store staff will assist in crediting the points to your membership account.</p>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="faq-item">
+      <button class="faq-question">Can I enjoy my membership privileges at Skechers Outlets?</button>
+      <div class="faq-answer">
+        <p>Skechers Members may redeem and use Welcome Vouchers (RM30/RM50) and RM20 E-Vouchers (redeemed using points) at Skechers Outlets. However, points will not be earned on purchases made at Skechers Outlets, and membership discounts are not applicable at these locations.</p>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="faq-item">
+      <button class="faq-question">If I own more than 1 voucher, can I redeem them together?</button>
+      <div class="faq-answer">
+        <p>Please be informed that effective 3 July 2023, only one (1) Gift Voucher or Welcome Voucher may be used and redeemed per single receipt. The redemption of multiple vouchers in one transaction is not permitted from the effective date onwards.</p>
+      </div>
+    </div>
+
+    <!-- 6 -->
+    <div class="faq-item">
+      <button class="faq-question">Will my points expired?</button>
+      <div class="faq-answer">
+        <p>Yes. Points earned within the same calendar year will expire on 31 March of the following year. Points carried forward into the next year will be referred to as Grace Points.</p>
+        <p>Example:<br>
+		Points earned up to 31 December 2026 will expire on 31 March 2027.<br>
+		Points earned from 1 January 2027 onwards will expire on 31 March 2028.
+		</p>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="faq-item">
+      <button class="faq-question">Where can the RM30/RM50 Welcome gift e-vouchers be used ?</button>
+      <div class="faq-answer">
+        <p>Welcome Gift E-Vouchers (RM30/RM50) and RM20 E-Vouchers can be used as cash equivalent at all Skechers Concept Stores, City Outlets, and Outlets. E-vouchers will not be reissued if used in a voided transaction or during system downtime.</p>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="faq-item">
+      <button class="faq-question">Must I Redeem the RM20 E-Voucher Once I Have Earned 180 Points?</button>
+      <div class="faq-answer">
+        <p>No. You can accumulate points and redeem them anytime before they expire via our member portal (members.skechers.com.my.).</p>
+		<p>Redeemed RM20 E-vouchers are valid only on the same day (until 11:59PM), it’s recommended to use them immediately. Only one (1) e-voucher can be redeemed per transaction (effective 3 July 2023).</p>
+      </div>
+    </div>
+
+    <!-- 9 -->
+    <div class="faq-item">
+      <button class="faq-question">As a Gold Member, will I receive any e-voucher when I achieve RM850 spend within the first 12 months?</button>
+      <div class="faq-answer">
+        <p>Yes. When you spend RM850 within 365 days, a RM50 Renewal E-Voucher will automatically be added to your account. You will receive a new RM50 Renewal E-Voucher every year if you continue to meet the Gold membership spending requirement.</p>
+      </div>
+    </div>
+
+    <!-- 10 -->
+    <div class="faq-item">
+      <button class="faq-question">What is the validity of the Skechers membership?</button>
+      <div class="faq-answer">
+        <p>Silver Members will be downgraded if they do not spend at least RM750 within 365 days.<br>
+		Gold Members will be downgraded to Silver if they do not spend at least RM1800 within 365 days.
+        </p>
+      </div>
+    </div>
+
+    <!-- 11 -->
+    <div class="faq-item">
+      <button class="faq-question">How do I log in to the member portal if I forget my password?</button>
+      <div class="faq-answer">
+        <p>At the member<a href="https://members.skechers.com.my/" rel="noreferrer" class="focus-custom"> portal</a> (members.skechers.com.my), select “Forgot your password” during sign-in. A reset email will be sent to your registered email address once you have completed the required information.</p>
+		<p>Alternatively, you can choose “Reset My Password using Mobile Number” to reset via your registered phone number.</p>
+      </div>
+    </div>
+	
+    <!-- 12 -->
+      <div class="faq-item">
+        <button class="faq-question">What are the members’ birthday rewards?</button>
+        <div class="faq-answer">
+          <p>Silver and Gold Members will earn double points on their first purchase during their birthday month (calendar month) at physical Skechers Stores that issue points. Please view the participating store list 
+      <a href="https://drive.google.com/file/d/1MyiZD99eWJ0aviYIL5T5ZP_KNSK8gmfu/view?usp=sharing" rel="noreferrer" class="focus-custom">here</a>.</p>
+        </div>
+      </div>
+    
+    <!-- 13 -->
+      <div class="faq-item">
+        <button class="faq-question">How do I upgrade to become Silver or Gold member ?</button>
+        <div class="faq-answer">
+          <p>To upgrade to Silver, spend a minimum of RM750 within 3 months.<br>
+      To upgrade to Gold, spend a minimum of RM1800 within 12 months.</p>
+        </div>
+      </div>
+    
+    <!-- 14 -->
+      <div class="faq-item">
+        <button class="faq-question">What is the voucher validity date?</button>
+        <div class="faq-answer">
+          <p>For RM30/RM50 Welcome Vouchers, the voucher validity is 1 year.<br>
+      For RM20 E-Vouchers (redeemed using points), the voucher validity is the same day (until 11:59 PM) when you redeem via our member 
+      <a href="https://members.skechers.com.my/" rel="noreferrer" class="focus-custom"> portal</a> (members.skechers.com.my).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll(".faq-question").forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const faqItem = this.parentElement;
+      const answer = this.nextElementSibling;
+      const isOpen = faqItem.classList.contains("active");
+
+      // Close all
+      document.querySelectorAll(".faq-item").forEach((item) => {
+        item.classList.remove("active");
+        item.querySelector(".faq-answer").style.display = "none";
+      });
+
+      // Open current if not already open
+      if (!isOpen) {
+        faqItem.classList.add("active");
+        answer.style.display = "block";
+      }
+    });
+  });
+</script>
+
+
+{% stylesheet %}
+{% endstylesheet %}
+
+{% javascript %}
+{% endjavascript %}

@@ -1,0 +1,5 @@
+api_version = "2024-04"
+uid = "6d2d715f-affd-cb79-e706-c8cf8155c6005d92cb15"
+type = "theme"
+name = "Voucher Section"
+handle = "voucher-theme-extension"

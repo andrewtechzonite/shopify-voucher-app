@@ -1,0 +1,229 @@
+{% if block.settings.show_section %}
+  {% if customer %}
+    <script type="text/javascript">
+      window.customerId = "{{ customer.id }}";
+    </script>
+
+    {% assign stripped_tag = '' %}
+    {% assign member_label = 'Member' %}
+    {% for tag in customer.tags %}
+      {% if tag contains 'skechers_' %}
+        {% assign stripped_tag = tag | remove: 'skechers_' %}
+        {% if stripped_tag == 'Gold' %}
+          {% assign member_label = 'Gold Member' %}
+        {% elsif stripped_tag == 'Silver' %}
+          {% assign member_label = 'Silver Member' %}
+        {% elsif stripped_tag == 'PreMember' %}
+          {% assign member_label = 'Pre-Member' %}
+        {% else %}
+          {% assign member_label = stripped_tag %}
+        {% endif %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    <style>
+      .voucher-widget {
+        background: {{ block.settings.background_color }};
+        border: 1px solid #e1e1e1;
+        border-radius: 12px;
+        padding: 20px;
+        cursor: pointer;
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+        max-width: 350px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .voucher-widget:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+      }
+
+      .voucher-widget__title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #213168;
+        margin: 0 0 15px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .voucher-widget__title svg {
+        width: 20px;
+        height: 20px;
+        fill: #213168;
+      }
+
+      .voucher-widget__info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .voucher-widget__row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+      }
+
+      .voucher-widget__label {
+        color: #666;
+      }
+
+      .voucher-widget__value {
+        font-weight: 600;
+        color: #213168;
+      }
+
+      .voucher-widget__value--tier {
+        color: #0070C0;
+      }
+
+      .voucher-widget__loading {
+        color: #999;
+        font-size: 12px;
+      }
+
+      .voucher-widget__cta {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 12px;
+        color: #0070C0;
+      }
+    </style>
+
+    <a href="/apps/my-voucher" class="voucher-widget">
+      <h3 class="voucher-widget__title">
+        {{ block.settings.title }}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+        </svg>
+      </h3>
+
+      <div class="voucher-widget__info">
+        <div class="voucher-widget__row">
+          <span class="voucher-widget__label">Tier</span>
+          <span class="voucher-widget__value voucher-widget__value--tier">{{ member_label }}</span>
+        </div>
+
+        <div class="voucher-widget__row">
+          <span class="voucher-widget__label">Points</span>
+          <span class="voucher-widget__value" id="widget-points">
+            <span class="voucher-widget__loading">Loading...</span>
+          </span>
+        </div>
+
+        <div class="voucher-widget__row">
+          <span class="voucher-widget__label">Points Expiry</span>
+          <span class="voucher-widget__value" id="widget-expiry">
+            <span class="voucher-widget__loading">Loading...</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="voucher-widget__cta">
+        Click to view your vouchers →
+      </div>
+    </a>
+
+    <script>
+      (function() {
+        const shopifyId = window.customerId;
+        if (!shopifyId) return;
+
+        const requestData = {
+          CountryCode: "MY",
+          shopifyID: shopifyId,
+        };
+
+        fetch('https://techzonite.skechers.com.my/api/skechers/getPointDetails', {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
+        })
+        .then(response => response.json())
+        .then(pointsData => {
+          const current = pointsData.find(p => p.PointsType === "Current");
+          if (current) {
+            document.getElementById('widget-points').textContent = parseInt(current.PointsBALValue) + ' pts';
+            const expiryDate = new Date(current.PointsExpiringDate);
+            document.getElementById('widget-expiry').textContent = expiryDate.toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric"
+            });
+          } else {
+            document.getElementById('widget-points').textContent = '0 pts';
+            document.getElementById('widget-expiry').textContent = '--';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching points:', error);
+          document.getElementById('widget-points').textContent = '--';
+          document.getElementById('widget-expiry').textContent = '--';
+        });
+      })();
+    </script>
+
+  {% else %}
+    <style>
+      .voucher-widget-login {
+        background: {{ block.settings.background_color }};
+        border: 1px solid #e1e1e1;
+        border-radius: 12px;
+        padding: 20px;
+        max-width: 350px;
+        text-decoration: none;
+        display: block;
+      }
+      .voucher-widget-login:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      }
+      .voucher-widget-login h3 {
+        font-size: 18px;
+        font-weight: bold;
+        color: #213168;
+        margin: 0 0 10px 0;
+      }
+      .voucher-widget-login p {
+        font-size: 14px;
+        color: #666;
+        margin: 0;
+      }
+    </style>
+    <a href="/account/login" class="voucher-widget-login">
+      <h3>{{ block.settings.title }}</h3>
+      <p>Log in to view your vouchers and points</p>
+    </a>
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Voucher Widget",
+  "target": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_section",
+      "label": "Show Voucher Widget",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "My Voucher"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    }
+  ]
+}
+{% endschema %}
