@@ -19,6 +19,6 @@ redirect_urls = [ "https://shopify-voucher-app-production.up.railway.app/api/aut
 automatically_update_urls_on_dev = true
 
 [app_proxy]
-url = "https://screenshot-impossible-tutorial-lottery.trycloudflare.com/proxy"
+url = "https://shopify-voucher-app-production.up.railway.app"
 subpath = "my-voucher"
 prefix = "apps"
